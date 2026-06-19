@@ -1,9 +1,14 @@
-TOP=alu
+CXXFLAGS=-std=c++17
 
-all:
-	verilator -Wall --cc rtl/core/alu.sv --exe sim/tb_alu.cpp -CFLAGS "-std=c++17"
-	make -C obj_dir -f V$(TOP).mk V$(TOP)
-	./obj_dir/V$(TOP)
+alu:
+	verilator -Wall --cc rtl/core/alu.sv --exe sim/tb_alu.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Valu.mk Valu
+	./obj_dir/Valu
+
+regfile:
+	verilator -Wall --cc rtl/core/regfile.sv --exe sim/tb_regfile.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vregfile.mk Vregfile
+	./obj_dir/Vregfile
 
 clean:
 	rm -rf obj_dir
