@@ -10,5 +10,11 @@ regfile:
 	make -C obj_dir -f Vregfile.mk Vregfile
 	./obj_dir/Vregfile
 
+decoder:
+	verilator -Wall --cc rtl/core/decoder.sv --exe sim/tb_decoder.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vdecoder.mk Vdecoder
+	./obj_dir/Vdecoder
+
+
 clean:
 	rm -rf obj_dir
