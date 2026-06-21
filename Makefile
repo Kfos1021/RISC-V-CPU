@@ -15,6 +15,15 @@ decoder:
 	make -C obj_dir -f Vdecoder.mk Vdecoder
 	./obj_dir/Vdecoder
 
+control:
+	verilator --Wall --cc rtl/core/control.sv \
+		--exe sim/tb_control.cpp \
+		-CFLAGS "-std=c++17"
+
+	make -C obj_dir -f Vcontrol.mk Vcontrol
+
+	./obj_dir/Vcontrol
+
 
 clean:
 	rm -rf obj_dir
