@@ -24,6 +24,10 @@ control:
 
 	./obj_dir/Vcontrol
 
+imm_gen:
+	verilator -Wall --cc rtl/core/imm_gen.sv --exe sim/tb_imm_gen.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vimm_gen.mk Vimm_gen
+	./obj_dir/Vimm_gen
 
 clean:
 	rm -rf obj_dir
