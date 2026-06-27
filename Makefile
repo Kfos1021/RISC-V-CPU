@@ -38,5 +38,10 @@ imem:
 	make -C obj_dir -f Vimem.mk Vimem
 	./obj_dir/Vimem
 
+dmem:
+	verilator -Wall --cc rtl/core/dmem.sv --exe sim/tb_dmem.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vdmem.mk Vdmem
+	./obj_dir/Vdmem
+
 clean:
 	rm -rf obj_dir
