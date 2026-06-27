@@ -21,13 +21,22 @@ control:
 		-CFLAGS "-std=c++17"
 
 	make -C obj_dir -f Vcontrol.mk Vcontrol
-
 	./obj_dir/Vcontrol
 
 imm_gen:
 	verilator -Wall --cc rtl/core/imm_gen.sv --exe sim/tb_imm_gen.cpp -CFLAGS "$(CXXFLAGS)"
 	make -C obj_dir -f Vimm_gen.mk Vimm_gen
 	./obj_dir/Vimm_gen
+
+pc:
+	verilator -Wall --cc rtl/core/pc.sv --exe sim/tb_pc.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vpc.mk Vpc
+	./obj_dir/Vpc
+
+imem:
+	verilator -Wall --cc rtl/core/imem.sv --exe sim/tb_imem.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vimem.mk Vimem
+	./obj_dir/Vimem
 
 clean:
 	rm -rf obj_dir
