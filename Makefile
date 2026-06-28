@@ -43,5 +43,10 @@ dmem:
 	make -C obj_dir -f Vdmem.mk Vdmem
 	./obj_dir/Vdmem
 
+cpu:
+	verilator -Wall --cc rtl/core/cpu.sv rtl/core/pc.sv rtl/core/imem.sv rtl/core/decoder.sv rtl/core/control.sv rtl/core/imm_gen.sv rtl/core/regfile.sv rtl/core/alu.sv rtl/core/dmem.sv --exe sim/tb_cpu.cpp -CFLAGS "$(CXXFLAGS)"
+	make -C obj_dir -f Vcpu.mk Vcpu
+	./obj_dir/Vcpu
+
 clean:
 	rm -rf obj_dir
