@@ -23,7 +23,10 @@ bool check(
     Vcpu* dut,
     uint32_t expected_pc,
     uint32_t expected_instruction,
-    uint32_t expected_alu_result
+    uint32_t expected_alu_result,
+    uint8_t expected_rd,
+    uint32_t expected_writeback,
+    bool expected_reg_write
 ) {
     bool pass = true;
 
@@ -45,6 +48,24 @@ bool check(
         pass = false;
     }
 
+    if(dut->rd_debug != expected_rd){
+        cout << "Fail rd: expected x" << unsigned(expected_rd)
+             << " got x" << unsigned(dut->rd_debug) << endl;
+        pass = false;
+    }
+
+    if(dut->writeback_debug != expected_writeback){
+        cout << "Fail writeback: expected " << expected_writeback
+             << " got " << dut->writeback_debug << endl;
+        pass = false;
+    }
+
+    if(dut->reg_write_debug != expected_reg_write){
+        cout << "Fail reg_write: expected " << expected_reg_write
+             << " got " << unsigned(dut->reg_write_debug) << endl;
+        pass = false;
+    }
+
     return pass;
 }
 
@@ -61,20 +82,24 @@ int main(){
 
     bool pass = true;
 
-    // Cycle 0: addi x5, x6, 10
-    pass &= check(dut, 0, 0x00A30293, 10);
+    // Cycle 0: addi x1, x0, 5
+    pass &= check(dut, 0, 0x00500093, 5, 1, 5, true);
     tick(dut);
 
-    // Cycle 1: add x5, x6, x7
-    pass &= check(dut, 4, 0x007302B3, 0);
+    // Cycle 1: addi x2, x0, 10
+    pass &= check(dut, 4, 0x00A00113, 10, 2, 10, true);
     tick(dut);
 
-    // Cycle 2: sub x5, x6, x7
-    pass &= check(dut, 8, 0x407302B3, 0);
+    // Cycle 2: add x3, x1, x2
+    pass &= check(dut, 8, 0x002081B3, 15, 3, 15, true);
     tick(dut);
 
-    // Cycle 3: nop
-    pass &= check(dut, 12, 0x00000013, 0);
+    // Cycle 3: sub x4, x2, x1
+    pass &= check(dut, 12, 0x40110233, 5, 4, 5, true);
+    tick(dut);
+
+    // Cycle 4: nop
+    pass &= check(dut, 16, 0x00000013, 0, 0, 0, true);
     tick(dut);
 
     if (pass){

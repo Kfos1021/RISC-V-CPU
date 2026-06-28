@@ -8,7 +8,11 @@ module cpu(
 
     output logic [31:0] pc_debug,
     output logic [31:0] instruction_debug,
-    output logic [31:0] alu_result_debug
+    output logic [31:0] alu_result_debug,
+
+    output logic [4:0] rd_debug,
+    output logic [31:0] writeback_debug,
+    output logic reg_write_debug
 );
 
     //Internal signals
@@ -141,8 +145,13 @@ module cpu(
     assign branch_taken = branch && (read_data1 == read_data2);
     assign branch_target = pc_out + imm;
 
+    // Export internal CPU signals for debugging and verification
+    // These outputs are only used by the simulation testbench
     assign pc_debug = pc_out;
     assign instruction_debug = instruction;
     assign alu_result_debug = alu_result;
+    assign rd_debug = rd;
+    assign writeback_debug = writeback_data;
+    assign reg_write_debug = reg_write;
 
 endmodule

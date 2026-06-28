@@ -11,10 +11,11 @@ module imem(
 
     // Initialize instruction memory with a small demo program
     initial begin
-        memory[0] = 32'h00A30293; // addi x5, x6, 10
-        memory[1] = 32'h007302B3; // add x5, x6, x7
-        memory[2] = 32'h407302B3; // sub x5, x6, x7
-        memory[3] = 32'h00000013; // nop
+        memory[0] = 32'h00500093; // addi x1, x0, 5
+        memory[1] = 32'h00A00113; // addi x2, x0, 10
+        memory[2] = 32'h002081B3; // add x3, x1, x2
+        memory[3] = 32'h40110233; // sub x4, x2, x1
+        memory[4] = 32'h00000013; // nop
     end
 
     //Convert byte address into a word index
