@@ -58,6 +58,15 @@ int main(){
     // Tests Shift Right Logical
     pass &= check(dut, 8, 1, 7, 4);
 
+    // SLL: 1 << 3 = 8
+    pass &= check(dut, 1, 3, 6, 8);
+
+    // SRL: 8 >> 1 = 4
+    pass &= check(dut, 8, 1, 7, 4);
+
+    // SRA: -16 >>> 2 = -4
+    pass &= check(dut, 0xFFFFFFF0, 2, 8, 0xFFFFFFFC); // SRA: -16 >>> 2 = -4
+
     if(pass){
         cout << "ALL ALU TESTS PASSED" << endl;
     }

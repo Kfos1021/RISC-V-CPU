@@ -29,6 +29,8 @@ module alu(
             //Shift right
             4'd7: result = a >> b[4:0];
             default: result = 32'd0;
+            //SRA
+            4'd8: result = $signed(a) >>> b[4:0];
         endcase
     end
 

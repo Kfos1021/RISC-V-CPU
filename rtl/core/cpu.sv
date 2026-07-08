@@ -12,7 +12,8 @@ module cpu(
 
     output logic [4:0] rd_debug,
     output logic [31:0] writeback_debug,
-    output logic reg_write_debug
+    output logic reg_write_debug,
+    output logic branch_taken_debug
 );
 
     //Internal signals
@@ -142,7 +143,7 @@ module cpu(
     assign writeback_data = mem_to_reg ? mem_read_data : alu_result;
 
     // Branch decision logic
-    assign branch_taken = branch && (read_data1 == read_data2);
+    assign branch_taken = branch && (alu_result == 32'd0);    
     assign branch_target = pc_out + imm;
 
     // Export internal CPU signals for debugging and verification
@@ -153,5 +154,6 @@ module cpu(
     assign rd_debug = rd;
     assign writeback_debug = writeback_data;
     assign reg_write_debug = reg_write;
+    assign branch_taken_debug = branch_taken;
 
 endmodule

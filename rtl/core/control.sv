@@ -49,7 +49,12 @@ module control(
                     3'b100: alu_op = 4'd4; // XOR
                     3'b010: alu_op = 4'd5; // SLT
                     3'b001: alu_op = 4'd6; // SLL
-                    3'b101: alu_op = 4'd7; // SRL
+                    3'b101: begin
+                        if(funct7 == 7'b0100000)
+                            alu_op = 4'd8; // SRA
+                        else
+                            alu_op = 4'd7; // SRL
+                    end
 
                     default: alu_op = 4'd0;
                 endcase
