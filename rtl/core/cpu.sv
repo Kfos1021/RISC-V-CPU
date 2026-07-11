@@ -20,6 +20,7 @@ module cpu(
     // Connect inputs of one module to inputs of another throughout processor
     logic branch_taken;
     logic [31:0] branch_target;
+    logic [31:0] jump_target;
     logic [31:0] pc_out;
 
     logic [31:0] instruction;
@@ -57,7 +58,7 @@ module cpu(
         .clk(clk),
         .reset(reset),
         .branch_taken(branch_taken),
-        .branch_target(branch_target),
+        .branch_target(jump ? jump_target : branch_target),
         .pc_out(pc_out)
     );
 
@@ -147,6 +148,7 @@ module cpu(
     // Branch decision logic
     assign branch_taken = jump || (branch && (alu_result == 32'd0));  
     assign branch_target = pc_out + imm;
+    assign jump_target = (opcode == 7'b1100111) ? ((read_data1 + imm) & 32'hFFFFFFFE) : branch_target;
 
     // Export internal CPU signals for debugging and verification
     // These outputs are only used by the simulation testbench

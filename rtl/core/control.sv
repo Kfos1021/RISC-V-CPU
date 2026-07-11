@@ -86,6 +86,14 @@ module control(
                 alu_op    = 4'd0;
             end
 
+            // Jump and link register: JALR
+            7'b1100111: begin
+                reg_write = 1;
+                alu_src   = 1;
+                jump      = 1;
+                alu_op    = 4'd0; // ADD rs1 + immediate
+            end
+
             //Load word: lw
             7'b0000011: begin
                 reg_write = 1;

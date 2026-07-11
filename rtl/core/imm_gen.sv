@@ -23,14 +23,12 @@ always_comb begin
 
     case(opcode)
 
-    //I-type instructions
-    //Used by addi, lw
+    // I-type immediates:
+    // ADDI/SLTI, loads, and JALR
     7'b0010011,
-    7'b0000011:
-    begin
-        //Sign-extend 12-bit immediate to 32 bits
-        imm = {{20{instruction[31]}},
-              instruction[31:20]};
+    7'b0000011,
+    7'b1100111: begin
+        imm = {{20{instruction[31]}}, instruction[31:20]};
     end
 
     //S-Type Instructions
