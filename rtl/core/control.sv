@@ -11,6 +11,7 @@ module control(
     output logic mem_write,
     output logic mem_to_reg,
     output logic branch,
+    output logic jump,
 
     //ALU operation selector
     //ADD -> 0, SUB -> 1, AND -> 2, OR -> 3, XOR -> 4, SLT -> 5, SLL -> 6, SRL -> 7
@@ -27,6 +28,7 @@ module control(
         mem_write = 0;
         mem_to_reg = 0;
         branch= 0;
+        jump = 0;
         alu_op = 0;
 
         case(opcode)
@@ -49,6 +51,7 @@ module control(
                     3'b100: alu_op = 4'd4; // XOR
                     3'b010: alu_op = 4'd5; // SLT
                     3'b001: alu_op = 4'd6; // SLL
+
                     3'b101: begin
                         if(funct7 == 7'b0100000)
                             alu_op = 4'd8; // SRA
@@ -64,7 +67,23 @@ module control(
             7'b0010011: begin
                 reg_write = 1;
                 alu_src = 1;
-                alu_op = 4'd0; //ADD
+
+                case (funct3)
+                    3'b000: alu_op = 4'd0; // ADDI
+                    3'b010: alu_op = 4'd5; // SLTI
+                    default: alu_op = 4'd0;
+                endcase
+            end
+
+            // Jump and link: JAL
+            7'b1101111: begin
+                reg_write = 1;
+                jump      = 1;
+
+                // These make the ALU output predictable for testing,
+                // although JAL does not use the ALU result for writeback.
+                alu_src   = 1;
+                alu_op    = 4'd0;
             end
 
             //Load word: lw
@@ -87,7 +106,8 @@ module control(
                 alu_src = 1;
                 mem_write = 1;
                 alu_op = 4'd0;
-             end
+            end
+
 
             //Unknown instructions, do nothing
             default: begin

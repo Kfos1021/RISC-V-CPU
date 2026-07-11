@@ -36,6 +36,7 @@ module cpu(
     logic mem_read;
     logic mem_write;
     logic mem_to_reg;
+    logic jump;
     logic branch;
     logic [3:0] alu_op;
 
@@ -93,12 +94,13 @@ module cpu(
         .mem_write(mem_write),
         .mem_to_reg(mem_to_reg),
         .branch(branch),
+        .jump(jump),
         .alu_op(alu_op)
     );
 
     // Immediate generator
     // Extracts and sign-extends immediates from I-type,
-    // S-type, and B-type instructions
+    // S-type, B-type, and J-type instructions
     imm_gen imm_gen_inst(
         .instruction(instruction),
         .imm(imm)
@@ -138,12 +140,12 @@ module cpu(
         .read_data(mem_read_data)
     );
 
-    // Select whether the register file receives the ALU
-    // result or data loaded from memory
-    assign writeback_data = mem_to_reg ? mem_read_data : alu_result;
+    // JAL writes the return address, PC + 4, into rd.
+    // Loads write memory data; other instructions write the ALU result.
+    assign writeback_data = jump  ? (pc_out + 32'd4) : mem_to_reg ? mem_read_data : alu_result;
 
     // Branch decision logic
-    assign branch_taken = branch && (alu_result == 32'd0);    
+    assign branch_taken = jump || (branch && (alu_result == 32'd0));  
     assign branch_target = pc_out + imm;
 
     // Export internal CPU signals for debugging and verification

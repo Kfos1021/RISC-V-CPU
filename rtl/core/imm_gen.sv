@@ -55,6 +55,25 @@ always_comb begin
         1'b0};
     end
 
+    7'b1101111: begin
+    // J-type immediate used by JAL.
+    //
+    // Immediate layout:
+    // imm[20]    = instruction[31]
+    // imm[10:1]  = instruction[30:21]
+    // imm[11]    = instruction[20]
+    // imm[19:12] = instruction[19:12]
+    // imm[0]     = 0
+        imm = {
+            {11{instruction[31]}},
+            instruction[31],
+            instruction[19:12],
+            instruction[20],
+            instruction[30:21],
+            1'b0
+        };
+    end
+
     //For unsupported instruction type
     //Output the immediate defaults to zero
     default:

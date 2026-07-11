@@ -82,28 +82,43 @@ int main(){
 
     bool pass = true;
 
-    // Cycle 0: addi x1, x0, 1
-    pass &= check(dut, 0, 0x00100093, 1, 1, 1, true);
+    // Cycle 0: jal x1, +8
+    // Writes return address PC + 4 = 4 into x1
+    // Then jumps from PC 0 to PC 8
+    pass &= check(
+        dut,
+        0,          // expected PC
+        0x008000EF, // jal x1, +8
+        8,          // ALU result; not used for JAL writeback
+        1,          // destination register x1
+        4,          // writeback value = PC + 4
+        true        // register write enabled
+    );
     tick(dut);
 
-    // Cycle 1: addi x2, x0, 3
-    pass &= check(dut, 4, 0x00300113, 3, 2, 3, true);
+    // Cycle 1: instruction at PC 4 was skipped
+    // addi x3, x0, 5 executes at PC 8
+    pass &= check(
+        dut,
+        8,          // branch/jump target
+        0x00500193, // addi x3, x0, 5
+        5,          // ALU result
+        3,          // destination register x3
+        5,          // writeback value
+        true
+    );
     tick(dut);
 
-    // Cycle 2: sll x3, x1, x2
-    pass &= check(dut, 8, 0x002091B3, 8, 3, 8, true);
-    tick(dut);
-
-    // Cycle 3: srl x4, x3, x1
-    pass &= check(dut, 12, 0x0011D233, 4, 4, 4, true);
-    tick(dut);
-
-    // Cycle 4: sra x5, x4, x1
-    pass &= check(dut, 16, 0x401252B3, 2, 5, 2, true);
-    tick(dut);
-
-    // Cycle 5: nop
-    pass &= check(dut, 20, 0x00000013, 0, 0, 0, true);
+    // Cycle 2: nop at PC 12
+    pass &= check(
+        dut,
+        12,
+        0x00000013,
+        0,
+        0,
+        0,
+        true
+    );
     tick(dut);
 
     if (pass){
