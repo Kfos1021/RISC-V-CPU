@@ -39,6 +39,7 @@ module cpu(
     logic mem_to_reg;
     logic jump;
     logic branch;
+    logic branch_condition;
     logic [3:0] alu_op;
 
     logic [31:0] imm;
@@ -145,8 +146,44 @@ module cpu(
     // Loads write memory data; other instructions write the ALU result.
     assign writeback_data = jump  ? (pc_out + 32'd4) : mem_to_reg ? mem_read_data : alu_result;
 
-    // Branch decision logic
-    assign branch_taken = jump || (branch && (alu_result == 32'd0));  
+    // Determine whether the current conditional branch is taken.
+    // funct3 selects the comparison required by the instruction.
+    always_comb begin
+        branch_condition = 1'b0;
+
+        case (funct3)
+            3'b000: begin
+                // BEQ: branch when the registers are equal
+                branch_condition = (read_data1 == read_data2);
+            end
+
+            3'b001: begin
+                // BNE: branch when the registers are not equal
+                branch_condition = (read_data1 != read_data2);
+            end
+
+            3'b100: begin
+                // BLT: signed less-than comparison
+                branch_condition =
+                    ($signed(read_data1) < $signed(read_data2));
+            end
+
+            3'b101: begin
+                // BGE: signed greater-than-or-equal comparison
+                branch_condition =
+                    ($signed(read_data1) >= $signed(read_data2));
+            end
+
+            default: begin
+                branch_condition = 1'b0;
+            end
+        endcase
+    end
+
+    // Redirect the PC for either a taken conditional branch
+    // or an unconditional JAL/JALR instruction.
+    assign branch_taken = jump || (branch && branch_condition);
+    
     assign branch_target = pc_out + imm;
     assign jump_target = (opcode == 7'b1100111) ? ((read_data1 + imm) & 32'hFFFFFFFE) : branch_target;
 

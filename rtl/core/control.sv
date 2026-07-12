@@ -103,9 +103,12 @@ module control(
                 alu_op = 4'd0;
             end
 
-            //Branch equal: beq
+            // Conditional branch instructions:
+            // BEQ, BNE, BLT, and BGE
             7'b1100011: begin
                 branch = 1;
+                reg_write = 0;
+                alu_src   = 0;
                 alu_op = 4'd1;
             end
 
