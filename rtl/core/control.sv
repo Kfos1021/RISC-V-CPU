@@ -66,11 +66,14 @@ module control(
             //I-type arithmetic, currently ADDI
             7'b0010011: begin
                 reg_write = 1;
-                alu_src = 1;
+                alu_src   = 1;
 
                 case (funct3)
                     3'b000: alu_op = 4'd0; // ADDI
                     3'b010: alu_op = 4'd5; // SLTI
+                    3'b100: alu_op = 4'd4; // XORI
+                    3'b110: alu_op = 4'd3; // ORI
+                    3'b111: alu_op = 4'd2; // ANDI
                     default: alu_op = 4'd0;
                 endcase
             end

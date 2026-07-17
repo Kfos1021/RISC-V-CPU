@@ -82,68 +82,64 @@ int main(){
 
     bool pass = true;
 
-    // Cycle 0: addi x1, x0, 5
-    pass &= check(dut, 0, 0x00500093, 5, 1, 5, true);
-    tick(dut);
-
-    // Cycle 1: addi x2, x0, 5
-    pass &= check(dut, 4, 0x00500113, 5, 2, 5, true);
-    tick(dut);
-
-    // Cycle 2: beq x1, x2, +8
-    // Equal, so jump from PC 8 to PC 16.
-    pass &= check(dut, 8, 0x00208463, 0, 8, 0, false);
-    tick(dut);
-
-    // Cycle 3: PC 12 was skipped.
-    // addi x3, x0, 1
-    pass &= check(dut, 16, 0x00100193, 1, 3, 1, true);
-    tick(dut);
-
-    // Cycle 4: bne x1, x2, +8
-    // Equal, so BNE is not taken. Next PC is 24.
-    pass &= check(dut, 20, 0x00209463, 0, 8, 0, false);
-    tick(dut);
-
-    // Cycle 5: addi x4, x0, 2
-    pass &= check(dut, 24, 0x00200213, 2, 4, 2, true);
-    tick(dut);
-
-    // Cycle 6: addi x2, x0, 7
-    pass &= check(dut, 28, 0x00700113, 7, 2, 7, true);
-    tick(dut);
-
-    // Cycle 7: blt x1, x2, +8
-    // Signed 5 < 7, so jump from PC 32 to PC 40.
-    // ALU performs 5 - 7, producing unsigned 0xFFFFFFFE.
+    // Cycle 0: addi x1, x0, 15
     pass &= check(
         dut,
-        32,
-        0x0020C463,
-        0xFFFFFFFE,
-        8,
-        0xFFFFFFFE,
-        false
+        0,
+        0x00F00093,
+        15,
+        1,
+        15,
+        true
     );
     tick(dut);
 
-    // Cycle 8: PC 36 was skipped.
-    // addi x5, x0, 3
-    pass &= check(dut, 40, 0x00300293, 3, 5, 3, true);
+    // Cycle 1: andi x2, x1, 10
+    pass &= check(
+        dut,
+        4,
+        0x00A0F113,
+        10,
+        2,
+        10,
+        true
+    );
     tick(dut);
 
-    // Cycle 9: bge x2, x1, +8
-    // Signed 7 >= 5, so jump from PC 44 to PC 52.
-    pass &= check(dut, 44, 0x00115463, 2, 8, 2, false);
+    // Cycle 2: ori x3, x1, 5
+    pass &= check(
+        dut,
+        8,
+        0x0050E193,
+        15,
+        3,
+        15,
+        true
+    );
     tick(dut);
 
-    // Cycle 10: PC 48 was skipped.
-    // addi x6, x0, 4
-    pass &= check(dut, 52, 0x00400313, 4, 6, 4, true);
+    // Cycle 3: xori x4, x1, 3
+    pass &= check(
+        dut,
+        12,
+        0x0030C213,
+        12,
+        4,
+        12,
+        true
+    );
     tick(dut);
 
-    // Cycle 11: nop
-    pass &= check(dut, 56, 0x00000013, 0, 0, 0, true);
+    // Cycle 4: nop
+    pass &= check(
+        dut,
+        16,
+        0x00000013,
+        0,
+        0,
+        0,
+        true
+    );
     tick(dut);
 
     if (pass){
