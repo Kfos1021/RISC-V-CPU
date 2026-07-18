@@ -74,6 +74,18 @@ module control(
                     3'b100: alu_op = 4'd4; // XORI
                     3'b110: alu_op = 4'd3; // ORI
                     3'b111: alu_op = 4'd2; // ANDI
+
+                    3'b001: begin
+                        alu_op = 4'd6; // SLLI
+                    end
+
+                    3'b101: begin
+                        if (funct7 == 7'b0100000)
+                            alu_op = 4'd8; // SRAI
+                        else
+                            alu_op = 4'd7; // SRLI
+                    end
+
                     default: alu_op = 4'd0;
                 endcase
             end

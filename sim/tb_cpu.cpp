@@ -82,50 +82,50 @@ int main(){
 
     bool pass = true;
 
-    // Cycle 0: addi x1, x0, 15
+    // Cycle 0: addi x1, x0, 1
     pass &= check(
         dut,
         0,
-        0x00F00093,
-        15,
+        0x00100093,
         1,
-        15,
+        1,
+        1,
         true
     );
     tick(dut);
 
-    // Cycle 1: andi x2, x1, 10
+    // Cycle 1: slli x2, x1, 3
     pass &= check(
         dut,
         4,
-        0x00A0F113,
-        10,
+        0x00309113,
+        8,
         2,
-        10,
+        8,
         true
     );
     tick(dut);
 
-    // Cycle 2: ori x3, x1, 5
+    // Cycle 2: srli x3, x2, 1
     pass &= check(
         dut,
         8,
-        0x0050E193,
-        15,
+        0x00115193,
+        4,
         3,
-        15,
+        4,
         true
     );
     tick(dut);
 
-    // Cycle 3: xori x4, x1, 3
+    // Cycle 3: srai x4, x3, 1
     pass &= check(
         dut,
         12,
-        0x0030C213,
-        12,
+        0x4011D213,
+        2,
         4,
-        12,
+        2,
         true
     );
     tick(dut);
