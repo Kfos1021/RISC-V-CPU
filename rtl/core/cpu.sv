@@ -41,6 +41,7 @@ module cpu(
     logic branch;
     logic branch_condition;
     logic lui;
+    logic auipc;
     logic [3:0] alu_op;
 
     logic [31:0] imm;
@@ -99,6 +100,7 @@ module cpu(
         .branch(branch),
         .jump(jump),
         .lui(lui),
+        .auipc(auipc),
         .alu_op(alu_op)
     );
 
@@ -148,9 +150,10 @@ module cpu(
     assign writeback_data =
         jump       ? (pc_out + 32'd4) :
         lui        ? imm             :
+        auipc      ? (pc_out + imm)  :
         mem_to_reg ? mem_read_data   :
                     alu_result;
-                    
+
     // Determine whether the current conditional branch is taken.
     // funct3 selects the comparison required by the instruction.
     always_comb begin

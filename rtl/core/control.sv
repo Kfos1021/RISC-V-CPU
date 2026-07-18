@@ -13,6 +13,7 @@ module control(
     output logic branch,
     output logic jump,
     output logic lui,
+    output logic auipc,
 
     //ALU operation selector
     //ADD -> 0, SUB -> 1, AND -> 2, OR -> 3, XOR -> 4, SLT -> 5, SLL -> 6, SRL -> 7
@@ -31,6 +32,7 @@ module control(
         branch= 0;
         jump = 0;
         lui = 0;
+        auipc = 0;
         alu_op = 0;
 
         case(opcode)
@@ -142,6 +144,12 @@ module control(
             7'b0110111: begin
                 reg_write = 1;
                 lui       = 1;
+            end
+
+            // Add upper immediate to PC: AUIPC
+            7'b0010111: begin
+                reg_write = 1;
+                auipc     = 1;
             end
 
 

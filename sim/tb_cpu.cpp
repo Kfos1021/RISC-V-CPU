@@ -82,26 +82,27 @@ int main(){
 
     bool pass = true;
 
-    // Cycle 0: lui x5, 0x12345
+    // Cycle 0: nop
     pass &= check(
         dut,
         0,
-        0x123452B7,
+        0x00000013,
         0,
-        5,
-        0x12345000,
+        0,
+        0,
         true
     );
     tick(dut);
 
-    // Cycle 1: addi x6, x0, -1
+    // Cycle 1: auipc x5, 0x12345
+    // PC = 4, so writeback = 0x12345000 + 4
     pass &= check(
         dut,
         4,
-        0xFFF00313,
-        0xFFFFFFFF,
-        6,
-        0xFFFFFFFF,
+        0x12345297,
+        0,
+        5,
+        0x12345004,
         true
     );
     tick(dut);

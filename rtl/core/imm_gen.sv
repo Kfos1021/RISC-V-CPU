@@ -72,8 +72,9 @@ always_comb begin
         };
     end
 
-    // U-type immediate used by LUI
-    7'b0110111: begin
+    // U-type immediates used by LUI and AUIPC
+    7'b0110111,
+    7'b0010111: begin
         imm = {instruction[31:12], 12'b0};
     end
 
