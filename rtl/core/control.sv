@@ -51,6 +51,7 @@ module control(
                     3'b100: alu_op = 4'd4; // XOR
                     3'b010: alu_op = 4'd5; // SLT
                     3'b001: alu_op = 4'd6; // SLL
+                    3'b011: alu_op = 4'd9; // SLTU
 
                     3'b101: begin
                         if(funct7 == 7'b0100000)
@@ -74,6 +75,7 @@ module control(
                     3'b100: alu_op = 4'd4; // XORI
                     3'b110: alu_op = 4'd3; // ORI
                     3'b111: alu_op = 4'd2; // ANDI
+                    3'b011: alu_op = 4'd9; // SLTIU
 
                     3'b001: begin
                         alu_op = 4'd6; // SLLI

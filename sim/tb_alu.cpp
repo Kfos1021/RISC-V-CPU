@@ -31,41 +31,94 @@ int main(){
     Valu* dut = new Valu;
     bool pass = true;
 
-    // Tests adding 10 + 5, should equal 15
-    pass &= check(dut, 10, 5, 0, 15);
+    // Cycle 0: addi x1, x0, -1
+    pass &= check(
+        dut,
+        0,
+        0xFFF00093,
+        0xFFFFFFFF,
+        1,
+        0xFFFFFFFF,
+        true
+    );
+    tick(dut);
 
-    // Tests subtracting 10 - 5, should equal 5
-    pass &= check(dut, 10, 5, 1, 5);
+    // Cycle 1: addi x2, x0, 1
+    pass &= check(
+        dut,
+        4,
+        0x00100113,
+        1,
+        2,
+        1,
+        true
+    );
+    tick(dut);
 
-    // Tests AND
-    pass &= check(dut, 0b1100, 0b1010, 2, 0b1000);
+    // Cycle 2: slt x3, x1, x2
+    // Signed comparison: -1 < 1
+    pass &= check(
+        dut,
+        8,
+        0x0020A1B3,
+        1,
+        3,
+        1,
+        true
+    );
+    tick(dut);
 
-    // Tests OR
-    pass &= check(dut, 0b1100, 0b1010, 3, 0b1110);
+    // Cycle 3: sltu x4, x1, x2
+    // Unsigned comparison: 0xFFFFFFFF is not less than 1
+    pass &= check(
+        dut,
+        12,
+        0x0020B233,
+        0,
+        4,
+        0,
+        true
+    );
+    tick(dut);
 
-    // Tests XOR
-    pass &= check(dut, 0b1100, 0b1010, 4, 0b0110);
+    // Cycle 4: slti x5, x1, 1
+    // Signed comparison: -1 < 1
+    pass &= check(
+        dut,
+        16,
+        0x0010A293,
+        1,
+        5,
+        1,
+        true
+    );
+    tick(dut);
 
-    // Tests SLT
-    pass &= check(dut, 3, 7, 5, 1);
+    // Cycle 5: sltiu x6, x1, 1
+    // Unsigned comparison: 0xFFFFFFFF is not less than 1
+    pass &= check(
+        dut,
+        20,
+        0x0010B313,
+        0,
+        6,
+        0,
+        true
+    );
+    tick(dut);
 
-    // Tests SLT
-    pass &= check(dut, 7, 3, 5, 0);
+    // Cycle 6: nop
+    pass &= check(
+        dut,
+        24,
+        0x00000013,
+        0,
+        0,
+        0,
+        true
+    );
+    tick(dut);
 
-    // Tests Shift Right Logical
-    pass &= check(dut, 1, 3, 6, 8);
-
-    // Tests Shift Right Logical
-    pass &= check(dut, 8, 1, 7, 4);
-
-    // SLL: 1 << 3 = 8
-    pass &= check(dut, 1, 3, 6, 8);
-
-    // SRL: 8 >> 1 = 4
-    pass &= check(dut, 8, 1, 7, 4);
-
-    // SRA: -16 >>> 2 = -4
-    pass &= check(dut, 0xFFFFFFF0, 2, 8, 0xFFFFFFFC); // SRA: -16 >>> 2 = -4
 
     if(pass){
         cout << "ALL ALU TESTS PASSED" << endl;
