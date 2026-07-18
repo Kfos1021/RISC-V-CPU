@@ -12,6 +12,7 @@ module control(
     output logic mem_to_reg,
     output logic branch,
     output logic jump,
+    output logic lui,
 
     //ALU operation selector
     //ADD -> 0, SUB -> 1, AND -> 2, OR -> 3, XOR -> 4, SLT -> 5, SLL -> 6, SRL -> 7
@@ -29,6 +30,7 @@ module control(
         mem_to_reg = 0;
         branch= 0;
         jump = 0;
+        lui = 0;
         alu_op = 0;
 
         case(opcode)
@@ -134,6 +136,12 @@ module control(
                 alu_src = 1;
                 mem_write = 1;
                 alu_op = 4'd0;
+            end
+
+            // Load upper immediate: LUI
+            7'b0110111: begin
+                reg_write = 1;
+                lui       = 1;
             end
 
 

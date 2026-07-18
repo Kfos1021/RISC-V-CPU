@@ -40,6 +40,7 @@ module cpu(
     logic jump;
     logic branch;
     logic branch_condition;
+    logic lui;
     logic [3:0] alu_op;
 
     logic [31:0] imm;
@@ -97,6 +98,7 @@ module cpu(
         .mem_to_reg(mem_to_reg),
         .branch(branch),
         .jump(jump),
+        .lui(lui),
         .alu_op(alu_op)
     );
 
@@ -142,10 +144,13 @@ module cpu(
         .read_data(mem_read_data)
     );
 
-    // JAL writes the return address, PC + 4, into rd.
-    // Loads write memory data; other instructions write the ALU result.
-    assign writeback_data = jump  ? (pc_out + 32'd4) : mem_to_reg ? mem_read_data : alu_result;
-
+    // Select the value written back to the register file.
+    assign writeback_data =
+        jump       ? (pc_out + 32'd4) :
+        lui        ? imm             :
+        mem_to_reg ? mem_read_data   :
+                    alu_result;
+                    
     // Determine whether the current conditional branch is taken.
     // funct3 selects the comparison required by the instruction.
     always_comb begin

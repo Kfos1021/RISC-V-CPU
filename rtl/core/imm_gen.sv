@@ -72,6 +72,11 @@ always_comb begin
         };
     end
 
+    // U-type immediate used by LUI
+    7'b0110111: begin
+        imm = {instruction[31:12], 12'b0};
+    end
+
     //For unsupported instruction type
     //Output the immediate defaults to zero
     default:
