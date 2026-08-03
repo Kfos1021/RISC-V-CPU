@@ -182,6 +182,18 @@ module cpu(
                     ($signed(read_data1) >= $signed(read_data2));
             end
 
+            3'b110: begin
+            // BLTU: branch when rs1 is less than rs2
+            // using an unsigned comparison.    
+                branch_condition = (read_data1 < read_data2);
+            end
+
+            3'b111: begin
+            // BGEU: branch when rs1 is greater than or equal to rs2
+            // using an unsigned comparison.
+                branch_condition = (read_data1 >= read_data2);
+            end
+
             default: begin
                 branch_condition = 1'b0;
             end

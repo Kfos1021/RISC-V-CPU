@@ -148,17 +148,17 @@ bool test_edge_cases(Valu* dut) {
         {0xAAAAAAAA, 0x55555555, 4, "XOR alternating bits"},
 
         // Shifts
-        {0x00000001, 31, 5, "SLL by 31"},
-        {0x80000000, 31, 6, "SRL by 31"},
-        {0x80000000, 31, 7, "SRA negative by 31"},
-        {0x80000000, 0,  7, "SRA by zero"},
-        {0x00000001, 32, 5, "SLL masked shift amount"},
-        {0x00000008, 34, 6, "SRL masked shift amount"},
+        {0x00000001, 31, 6, "SLL by 31"},
+        {0x80000000, 31, 7, "SRL by 31"},
+        {0x80000000, 31, 8, "SRA negative by 31"},
+        {0x80000000, 0,  8, "SRA by zero"},
+        {0x00000001, 32, 6, "SLL masked shift amount"},
+        {0x00000008, 34, 7, "SRL masked shift amount"},
 
         // Signed comparison
-        {0xFFFFFFFF, 0x00000001, 8, "SLT negative less than positive"},
-        {0x00000001, 0xFFFFFFFF, 8, "SLT positive versus negative"},
-        {0x80000000, 0x7FFFFFFF, 8, "SLT signed extremes"},
+        {0xFFFFFFFF, 0x00000001, 5, "SLT negative less than positive"},
+        {0x00000001, 0xFFFFFFFF, 5, "SLT positive versus negative"},
+        {0x80000000, 0x7FFFFFFF, 5, "SLT signed extremes"},
 
         // Unsigned comparison
         {0xFFFFFFFF, 0x00000001, 9, "SLTU maximum versus one"},
