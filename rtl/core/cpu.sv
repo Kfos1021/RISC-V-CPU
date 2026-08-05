@@ -17,7 +17,7 @@ module cpu(
 );
 
     //Internal signals
-    // Connect inputs of one module to inputs of another throughout processor
+    //Connect inputs of one module to inputs of another throughout processor
     logic branch_taken;
     logic [31:0] branch_target;
     logic [31:0] jump_target;
@@ -141,9 +141,10 @@ module cpu(
         .clk(clk),
         .mem_read(mem_read),
         .mem_write(mem_write),
+        .funct3(funct3),
         .address(alu_result),
         .write_data(read_data2),
-        .read_data(mem_read_data)
+        .read_data(mem_read_data),
     );
 
     // Select the value written back to the register file.
