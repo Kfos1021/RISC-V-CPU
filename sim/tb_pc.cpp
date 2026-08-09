@@ -37,6 +37,7 @@ int main(){
     dut->reset = 1;
     dut->branch_taken = 0;
     dut->branch_target = 0;
+    dut->enable = 1;
 
     // Verify reset initializes the PC to address 0
     tick(dut);
@@ -64,6 +65,18 @@ int main(){
 
     tick(dut);
     pass &= check(dut, 44);
+
+    // Disable the PC and verify it holds its value.
+    dut->enable = 0;
+
+    tick(dut);
+    pass &= check(dut, 44);
+
+    // Re-enable the PC and verify normal execution resumes.
+    dut->enable = 1;
+
+    tick(dut);
+    pass &= check(dut, 48);
 
     // Print test results
     if(pass)

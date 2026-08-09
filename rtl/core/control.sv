@@ -3,6 +3,7 @@ module control(
     input logic [6:0] opcode,
     input logic [2:0] funct3,
     input logic [6:0] funct7,
+    input logic [31:0] instruction,
 
     // Control signals sent to datapath
     output logic reg_write,
@@ -14,6 +15,8 @@ module control(
     output logic jump,
     output logic lui,
     output logic auipc,
+    output logic system_halt,
+    output logic illegal_instruction,
 
     //ALU operation selector
     //ADD -> 0, SUB -> 1, AND -> 2, OR -> 3, XOR -> 4, SLT -> 5, SLL -> 6, SRL -> 7
@@ -33,6 +36,7 @@ module control(
         jump = 0;
         lui = 0;
         auipc = 0;
+        illegal_instruction = 0;
         alu_op = 0;
 
         case(opcode)
@@ -64,7 +68,10 @@ module control(
                             alu_op = 4'd7; // SRL
                     end
 
-                    default: alu_op = 4'd0;
+                    default: begin
+                        reg_write = 1'b0;
+                        illegal_instruction = 1'b1;
+                    end
                 endcase
             end
 
@@ -92,7 +99,10 @@ module control(
                             alu_op = 4'd7; // SRLI
                     end
 
-                    default: alu_op = 4'd0;
+                    default: begin
+                        reg_write = 1'b0;
+                        illegal_instruction = 1'b1;
+                    end
                 endcase
             end
 
@@ -152,16 +162,29 @@ module control(
                 auipc     = 1;
             end
 
+            7'b0001111: begin
+                // FENCE
+                // No operation is required in this simple single-core CPU.
+                // All control signals remain at their safe default values.
+                illegal_instruction = 1'b0;
+            end
+
+
+            7'b1110011: begin
+                case (instruction)
+                    32'h00000073: system_halt = 1'b1; // ECALL
+                    32'h00100073: system_halt = 1'b1; // EBREAK
+
+                    default: begin
+                        illegal_instruction = 1'b1;
+                    end
+                endcase
+            end
 
             //Unknown instructions, do nothing
             default: begin
-                reg_write = 0;
-                alu_src = 0;
-                mem_read = 0;
-                mem_write = 0;
-                mem_to_reg = 0;
-                branch = 0;
-                alu_op = 0;
+                system_halt = 1'b0;
+                illegal_instruction = 1'b1;
             end
         endcase
     end

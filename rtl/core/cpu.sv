@@ -2,7 +2,7 @@
 // Connects together all datapath and control modules
 // -program counter, instruction memory, decoder, control unit,
 // immediate generator, register file, ALU, data memory
-module cpu(
+module cpu #(parameter string IMEM_FILE = "programs/cpu_test.hex")(
     input logic clk,
     input logic reset,
 
@@ -12,8 +12,12 @@ module cpu(
 
     output logic [4:0] rd_debug,
     output logic [31:0] writeback_debug,
+    output logic [31:0] dmem_read_debug,
+    output logic [31:0] signature_debug,
     output logic reg_write_debug,
-    output logic branch_taken_debug
+    output logic branch_taken_debug,
+    output logic system_halt_debug,
+    output logic illegal_instruction_debug
 );
 
     //Internal signals
@@ -40,6 +44,11 @@ module cpu(
     logic jump;
     logic branch;
     logic branch_condition;
+    logic illegal_instruction;
+    logic safe_reg_write;
+    logic safe_mem_write;
+    logic system_halt;
+    logic cpu_halt;
     logic lui;
     logic auipc;
     logic [3:0] alu_op;
@@ -54,6 +63,7 @@ module cpu(
 
     logic [31:0] mem_read_data;
     logic [31:0] writeback_data;
+    logic [31:0] signature;
 
     // Program counter, holds address of current instruction
     // and updates every clock cycle
@@ -62,14 +72,17 @@ module cpu(
         .reset(reset),
         .branch_taken(branch_taken),
         .branch_target(jump ? jump_target : branch_target),
+        .enable(!cpu_halt),
         .pc_out(pc_out)
     );
 
     // Instruction memory, fetches the instruction
     // located at the current PC
-    imem imem_inst(
-        .pc(pc_out),
-        .instruction(instruction)
+    imem #(
+    .MEM_FILE(IMEM_FILE)
+    ) imem_inst (
+    .pc(pc_out),
+    .instruction(instruction)
     );
 
     // Instruction decoder
@@ -100,6 +113,9 @@ module cpu(
         .branch(branch),
         .jump(jump),
         .lui(lui),
+        .illegal_instruction(illegal_instruction),
+        .instruction(instruction),
+        .system_halt(system_halt),
         .auipc(auipc),
         .alu_op(alu_op)
     );
@@ -116,7 +132,7 @@ module cpu(
     // one destination register each clock cycle
     regfile regfile_inst(
         .clk(clk),
-        .we(reg_write),
+        .we(safe_reg_write),
         .rs1(rs1),
         .rs2(rs2),
         .rd(rd),
@@ -140,11 +156,12 @@ module cpu(
     dmem dmem_inst(
         .clk(clk),
         .mem_read(mem_read),
-        .mem_write(mem_write),
+        .mem_write(safe_mem_write),
         .funct3(funct3),
         .address(alu_result),
         .write_data(read_data2),
         .read_data(mem_read_data),
+        .signature_debug(signature)
     );
 
     // Select the value written back to the register file.
@@ -208,6 +225,11 @@ module cpu(
     assign branch_target = pc_out + imm;
     assign jump_target = (opcode == 7'b1100111) ? ((read_data1 + imm) & 32'hFFFFFFFE) : branch_target;
 
+    // Halt and safe write-control logic
+    assign cpu_halt = illegal_instruction || system_halt;
+    assign safe_reg_write = reg_write && !cpu_halt;
+    assign safe_mem_write = mem_write && !cpu_halt;
+
     // Export internal CPU signals for debugging and verification
     // These outputs are only used by the simulation testbench
     assign pc_debug = pc_out;
@@ -215,7 +237,11 @@ module cpu(
     assign alu_result_debug = alu_result;
     assign rd_debug = rd;
     assign writeback_debug = writeback_data;
-    assign reg_write_debug = reg_write;
+    assign reg_write_debug = safe_reg_write;
+    assign illegal_instruction_debug = illegal_instruction;
+    assign dmem_read_debug = mem_read_data;
+    assign signature_debug = signature;
+    assign system_halt_debug = system_halt;
     assign branch_taken_debug = branch_taken;
 
 endmodule

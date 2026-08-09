@@ -1,4 +1,19 @@
+RTL := \
+	rtl/core/cpu.sv \
+	rtl/core/pc.sv \
+	rtl/core/imem.sv \
+	rtl/core/decoder.sv \
+	rtl/core/control.sv \
+	rtl/core/imm_gen.sv \
+	rtl/core/regfile.sv \
+	rtl/core/alu.sv \
+	rtl/core/dmem.sv
+
+VERILATOR = verilator -Wall --cc
+
 CXXFLAGS=-std=c++17
+
+.PHONY: software compiled cpu clean alu regfile decoder control imm_gen pc imem dmem
 
 alu:
 	verilator -Wall --cc rtl/core/alu.sv --exe sim/tb_alu.cpp -CFLAGS "$(CXXFLAGS)"
@@ -44,9 +59,47 @@ dmem:
 	./obj_dir/Vdmem
 
 cpu:
-	verilator -Wall --cc rtl/core/cpu.sv rtl/core/pc.sv rtl/core/imem.sv rtl/core/decoder.sv rtl/core/control.sv rtl/core/imm_gen.sv rtl/core/regfile.sv rtl/core/alu.sv rtl/core/dmem.sv --exe sim/tb_cpu.cpp -CFLAGS "$(CXXFLAGS)"
+	$(VERILATOR) \
+		$(RTL) \
+		--exe sim/tb_cpu.cpp \
+		-CFLAGS "$(CXXFLAGS)"
+
 	make -C obj_dir -f Vcpu.mk Vcpu
 	./obj_dir/Vcpu
+
+compiled: software
+	$(VERILATOR) \
+		-GIMEM_FILE=\"programs/simple.hex\" \
+		$(RTL) \
+		--exe sim/tb_cpu_compiled.cpp \
+		-CFLAGS "$(CXXFLAGS)"
+
+	make -C obj_dir -f Vcpu.mk Vcpu
+	./obj_dir/Vcpu
+
+software:
+	riscv64-unknown-elf-gcc \
+		-march=rv32i \
+		-mabi=ilp32 \
+		-nostdlib \
+		-nostartfiles \
+		-ffreestanding \
+		-O0 \
+		-T software/linker.ld \
+		software/start.S \
+		software/simple.c \
+		-o software/simple.elf
+
+	riscv64-unknown-elf-objdump \
+		-d software/simple.elf \
+		> software/simple.dump
+
+	riscv64-unknown-elf-objcopy \
+		-O binary \
+		software/simple.elf \
+		software/simple.bin
+
+	python3 software/bin_to_hex.py
 
 clean:
 	rm -rf obj_dir

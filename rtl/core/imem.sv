@@ -1,5 +1,5 @@
 /* verilator lint_off UNUSEDSIGNAL */
-module imem(
+module imem #(parameter string MEM_FILE = "programs/cpu_test.hex")(
     // Current program counter
     input logic [31:0] pc,
     
@@ -11,7 +11,7 @@ module imem(
 
     // Initialize instruction memory with a small demo program
     initial begin
-        $readmemh("programs/cpu_test.hex", memory);
+        $readmemh(MEM_FILE, memory);
     end
 
     //Convert byte address into a word index

@@ -16,11 +16,16 @@ module dmem(
     // Value from register file to store
     input logic [31:0] write_data,
 
+    output logic [31:0] signature_debug,
+
     // Value loaded from memory 
     output logic [31:0] read_data
+
 );
     
     logic [31:0] memory [0:255];
+    // Expose data-memory word 0 as a program result/signature.
+    assign signature_debug = memory[0];
     
     // Synchronous write logic
     // Stores data only on the rising edge of the clock

@@ -85,196 +85,146 @@ int main(){
 
     bool pass = true;
 
-        // PC 0: lui x1, 0x80ff8
+        // Cycle 0: addi x1, x0, -1
     pass &= check(
         dut,
         0,
-        0x80FF80B7,
-        0,                  // ALU output is not relevant for LUI
+        0xFFF00093,
+        0xFFFFFFFF,
         1,
-        0x80FF8000,
-        true,
-        false
-    );
-    tick(dut);
-
-    // PC 4: addi x1, x1, -255
-    // 0x80FF8000 - 255 = 0x80FF7F01
-    pass &= check(
-        dut,
-        4,
-        0xF0108093,
-        0x80FF7F01,
-        1,
-        0x80FF7F01,
-        true
-    );
-    tick(dut);
-
-    // PC 8: sw x1, 0(x0)
-    pass &= check(
-        dut,
-        8,
-        0x00102023,
-        0,
-        0,
-        0,
-        false
-    );
-    tick(dut);
-
-    // PC 12: lb x2, 0(x0)
-    pass &= check(
-        dut,
-        12,
-        0x00000103,
-        0,
-        2,
-        0x00000001,
-        true
-    );
-    tick(dut);
-
-    // PC 16: lbu x3, 2(x0)
-    pass &= check(
-        dut,
-        16,
-        0x00204183,
-        2,
-        3,
-        0x000000FF,
-        true
-    );
-    tick(dut);
-
-    // PC 20: lb x4, 2(x0)
-    pass &= check(
-        dut,
-        20,
-        0x00200203,
-        2,
-        4,
         0xFFFFFFFF,
         true
     );
     tick(dut);
 
-    // PC 24: lhu x5, 2(x0)
+    // Cycle 1: addi x2, x0, 1
+    pass &= check(
+        dut,
+        4,
+        0x00100113,
+        1,
+        2,
+        1,
+        true
+    );
+    tick(dut);
+
+    // Cycle 2: bltu x1, x2, +8
+    // Unsigned 0xFFFFFFFF < 1 is false, so the branch is not taken.
+    pass &= check(
+        dut,
+        8,
+        0x0020E463,
+        0xFFFFFFFE,
+        8,
+        0xFFFFFFFE,
+        false
+    );
+    tick(dut);
+
+    // Cycle 3: addi x3, x0, 3
+    pass &= check(
+        dut,
+        12,
+        0x00300193,
+        3,
+        3,
+        3,
+        true
+    );
+    tick(dut);
+
+    // Cycle 4: bgeu x1, x2, +8
+    // Unsigned 0xFFFFFFFF >= 1 is true, so PC 20 is skipped.
+    pass &= check(
+        dut,
+        16,
+        0x0020F463,
+        0xFFFFFFFE,
+        8,
+        0xFFFFFFFE,
+        false
+    );
+    tick(dut);
+
+    // Cycle 5: addi x4, x0, 4 at PC 24
     pass &= check(
         dut,
         24,
-        0x00205283,
-        2,
-        5,
-        0x000080FF,
+        0x00400213,
+        4,
+        4,
+        4,
         true
     );
     tick(dut);
 
-    // PC 28: lh x6, 2(x0)
+    // Cycle 6: bltu x2, x1, +8
+    // Unsigned 1 < 0xFFFFFFFF is true, so PC 32 is skipped.
     pass &= check(
         dut,
         28,
-        0x00201303,
+        0x00116463,
         2,
-        6,
-        0xFFFF80FF,
-        true
+        8,
+        2,
+        false
     );
     tick(dut);
 
-    // PC 32: addi x7, x0, 0x55
-    pass &= check(
-        dut,
-        32,
-        0x05500393,
-        0x55,
-        7,
-        0x55,
-        true
-    );
-    tick(dut);
-
-    // PC 36: sb x7, 1(x0)
-    // Memory changes from 0x80FF7F01 to 0x80FF5501.
+    // Cycle 7: addi x5, x0, 5 at PC 36
     pass &= check(
         dut,
         36,
-        0x007000A3,
-        1,
-        1,                  // Store immediate occupies the rd bit positions
-        1,
-        false
+        0x00500293,
+        5,
+        5,
+        5,
+        true
     );
     tick(dut);
 
-    // PC 40: lw x8, 0(x0)
+    // Cycle 8: bgeu x2, x1, +8
+    // Unsigned 1 >= 0xFFFFFFFF is false, so the branch is not taken.
     pass &= check(
         dut,
         40,
-        0x00002403,
-        0,
+        0x00117463,
+        2,
         8,
-        0x80FF5501,
-        true
+        2,
+        false
     );
     tick(dut);
 
-    // PC 44: lui x9, 0xB
+    // Cycle 9: addi x6, x0, 99
     pass &= check(
         dut,
         44,
-        0x0000B4B7,
-        0,
-        9,
-        0x0000B000,
-        true,
-        false
+        0x06300313,
+        99,
+        6,
+        99,
+        true
     );
     tick(dut);
 
-    // PC 48: addi x9, x9, -0x545
-    // 0xB000 - 0x545 = 0xAABB
+    // Cycle 10: addi x6, x0, 6
     pass &= check(
         dut,
         48,
-        0xABB48493,
-        0x0000AABB,
-        9,
-        0x0000AABB,
+        0x00600313,
+        6,
+        6,
+        6,
         true
     );
     tick(dut);
 
-    // PC 52: sh x9, 2(x0)
-    // Memory changes from 0x80FF5501 to 0xAABB5501.
+    // Cycle 11: nop
     pass &= check(
         dut,
         52,
-        0x00901123,
-        2,
-        2,                  // Store immediate occupies the rd bit positions
-        2,
-        false
-    );
-    tick(dut);
-
-    // PC 56: lw x10, 0(x0)
-    pass &= check(
-        dut,
-        56,
-        0x00002503,
-        0,
-        10,
-        0xAABB5501,
-        true
-    );
-    tick(dut);
-
-    // PC 60: nop
-    pass &= check(
-        dut,
-        60,
         0x00000013,
         0,
         0,

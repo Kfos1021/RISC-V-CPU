@@ -138,6 +138,23 @@ int main(){
         1       //SUB for comparison
     );
 
+    // FENCE test
+    pass &= check(
+        dut,
+
+        0x0F,   // opcode = 0001111
+        0x0,    // funct3
+        0x00,   // funct7
+
+        false,  // reg_write
+        false,  // alu_src
+        false,  // mem_read
+        false,  // mem_write
+        false,  // mem_to_reg
+        false,  // branch
+        0       // default ALU operation, unused
+    );
+
     if(pass){
         cout << "All control tests passed" << endl;
     }
